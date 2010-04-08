@@ -1,0 +1,42 @@
+Ordinary differential equations solvers in Common Lisp
+Currently includes adaptive stepsize Runge-Kutta method.
+Define a function of independant variable & state object as the differential equation to solve.
+State may be any object with state arithmetic methods defined. Number and vector state methods are provided.
++x2: state addition
+-x2: state subtraction
+*xs: state times scalar number
+norminfx: state infinity norm
+
+Usage
+=====
+
+(rka fun t0 tf x0 &key (a *a-dp*) (bl *bl-dp*) (bh *bh-dp*) (c *c-dp*) (tol 1d-6) (hmax 0.25) (h0 (/ (- tf t0) 200d0)) (hmin (/ (- tf t0) 1d12)))
+
+Arguments
+---------
+
+FUN: function of independant variable & state, e.g. (fun tn x)
+T0: starting independant variable
+TF: final independant variable
+X0: state at T0
+
+Optional key arguments
+----------------------
+
+:A A matrix (default Dormand-Prince)
+:BL lower order B vector (default Dormand-Prince)
+:BH higher order B vector (default Dormand-Prince)
+:C C vector (default Dormand-Prince)
+:TOL relative tolerance
+:HMAX max stepsize
+:H0 initial stepsize
+:HMIN minimum stepsize
+
+Examples
+--------
+
+Integrate (cos tn) over range 0 to 2pi:
+(defun testfun (tn x)
+  (cos tn))
+(rka #'testfun 0d0 (* 2d0 pi) 0d0)
+
