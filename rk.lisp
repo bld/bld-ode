@@ -1,33 +1,5 @@
 (in-package :bld-ode)
 
-;; State arithmetic
-(defgeneric +x2 (a b)
-  (:documentation "Add two states together, using per-class methods"))
-(defgeneric -x2 (a b)
-  (:documentation "Subtract one state from another"))
-(defgeneric *xs (x s)
-  (:documentation "Multiply all elements of a state by a scalar using per-class methods"))
-(defgeneric norminfx (x)
-  (:documentation "Infinity norm of a state"))
-;; Numeric state arithmetic
-(defmethod +x2 ((a number) (b number))
-  (+ a b))
-(defmethod -x2 ((a number) (b number))
-  (- a b))
-(defmethod *xs ((s number) (x number))
-  (* s x))
-(defmethod norminfx ((x number))
-  (abs x))
-;; Vector state arithmetic
-(defmethod +x2 ((a vector) (b vector))
-  (map 'vector #'+x2 a b))
-(defmethod -x2 ((a vector) (b vector))
-  (map 'vector #'-x2 a b))
-(defmethod *xs ((x vector) (s number))
-  (map 'vector #'(lambda (xi) (*xs xi s)) x))
-(defmethod norminfx ((x vector))
-  (reduce #'max (map 'vector #'norminfx x)))
-
 ;; Stepping functions
 (defun ki (fun tm i h x k c a)
   "Calculate intermediate k value"
@@ -79,7 +51,7 @@
   (make-array 7 :element-type 'double-float :initial-contents (list 0d0 (/ 2d0 10d0) (/ 3d0 10d0) (/ 8d0 10d0) (/ 8d0 9d0) 1d0 1d0)))
 
 ;; Runge Kutta w/adaptive stepsize driver function
-(defun rka (fun t0 tf x0 &key (a *a-dp*) (bl *bl-dp*) (bh *bh-dp*) (c *c-dp*) (tol 1d-6) (hmax 0.25) (h0 (/ (- tf t0) 200d0)) (hmin (/ (- tf t0) 1d12)) &aux (s (length bl)))
+(defun rka (fun t0 tf x0 &key (a *a-dp*) (bl *bl-dp*) (bh *bh-dp*) (c *c-dp*) (tol 1d-6) (hmax 0.25) (h0 (/ (- tf t0) 200d0)) (hmin (/ (- tf t0) 1d12)) param &aux (s (length bl)))
   "Runge-Kutta method with adaptive stepsize. States are generic. They may be numbers, arrays, classes, etc., so long as they have state addition and scalar multiplication functions.  Results are collected into a list of independant variables & states."
   (loop
      with flag = t ; flag indicating whether integration completed
@@ -102,4 +74,4 @@
      finally (when (< tm tf) ; check if integration finished
 	       (setq flag nil) ; flag NIL if TF not reached: h too small
 	       (warn "Stepsize ~a smaller than minimum ~a." h hmin))
-       (return (values out flag))))
+       (return (values (cons (list t0 x0) out) flag))))

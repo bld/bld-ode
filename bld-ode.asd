@@ -9,6 +9,8 @@
   :maintainer "Benjamin L. Diedrich <ben@solarsails.info>"
   :license "MIT"
   :description "Ordinary Differential Equation solvers"
+  :depends-on ("bld-utils")
   :components
   ((:file "package")
-   (:file "rk" :depends-on ("package"))))
+   (:file "state" :depends-on ("package"))
+   (:file "rk" :depends-on ("package" "state"))))
