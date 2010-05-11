@@ -27,6 +27,31 @@
   (map 'vector #'(lambda (xi) (*xs xi s)) x))
 (defmethod norminfx ((x vector))
   (reduce #'max (map 'vector #'norminfx x)))
+;; Hash table state arithmetic
+(defmethod +x2 ((a hash-table) (b hash-table))
+  (let ((result (make-hash-table)))
+    (loop for k being the hash-keys in a
+       for va being the hash-values in a
+       for vb being the hash-values in b
+       do (setf (gethash k result) (+x2 va vb)))
+    result))
+(defmethod -x2 ((a hash-table) (b hash-table))
+  (let ((result (make-hash-table)))
+    (loop for k being the hash-keys in a
+       for va being the hash-values in a
+       for vb being the hash-values in b
+       do (setf (gethash k result) (-x2 va vb)))
+    result))
+(defmethod *xs ((x hash-table) (s number))
+  (let ((result (make-hash-table)))
+    (loop for k being the hash-keys in x
+       for v being the hash-values in x
+       do (setf (gethash k result) (*xs v s)))
+    result))
+(defmethod norminfx ((x hash-table))
+  (loop for v being the hash-values in x
+     maximize (norminfx v)))
+
 ;; Define methods on state classes
 (defmacro defstatemethod-2arg (meth class slots)
   `(defmethod ,meth ((a ,class) (b ,class))
@@ -54,7 +79,12 @@
      (def*xsmethod ,class ,slots)
      (defnorminfxmethod ,class ,slots)))
 (defmacro defstate (class slots)
-  `(defclass ,class ()
-     (,@(loop for slot in slots
-	   collect `(,slot :initarg ,(make-keyword slot) :reader ,slot)))))
-
+  `(progn
+     (defclass ,class ()
+       (,@(loop for slot in slots
+	     collect `(,slot :initarg ,(make-keyword slot) :reader ,slot))))
+     (defmethod print-object ((x ,class) stream)
+       (format stream "#<~a" ',class)
+       ,@(loop for slot in slots
+	    collect `(format stream " ~a ~a" ',slot (slot-value x ',slot)))
+       (format stream ">"))))
