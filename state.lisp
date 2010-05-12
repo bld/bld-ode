@@ -52,6 +52,12 @@
   (loop for v being the hash-values in x
      maximize (norminfx v)))
 
+;; Define PRINT-OBJECT method for hash tables
+(defmethod print-object ((h hash-table) stream)
+  (format stream "#<HASH-TABLE")
+  (maphash #'(lambda (k v) (format stream " ~a ~a" k v)) h)
+  (format stream ">"))
+
 ;; Define methods on state classes
 (defmacro defstatemethod-2arg (meth class slots)
   `(defmethod ,meth ((a ,class) (b ,class))
