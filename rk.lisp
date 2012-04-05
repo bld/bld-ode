@@ -3,13 +3,13 @@
 ;; Stepping functions
 (defun ki (fun tm i h x k c a)
   "Calculate intermediate k value"
-  (setf (aref k i) (*xs (aref k 0) (aref a i 0)))
+  (setf (aref k i) (* (aref k 0) (aref a i 0)))
   (loop for j from 1 below i
-     do (setf (aref k i) (+x2 (aref k i) (*xs (aref k j) (aref a i j)))))
+     do (setf (aref k i) (+ (aref k i) (* (aref k j) (aref a i j)))))
   (funcall
    fun
    (+ tm (* h (aref c i)))
-   (+x2 (*xs (aref k i) h) x)))
+   (+ (* (aref k i) h) x)))
 (defun kall (fun tm h x s c a)
   "Calculate vector of K values"
   (let ((k (make-array 7)))
@@ -20,12 +20,12 @@
     k))
 (defun xnext (x h k b)
   "Calculate next state"
-  (+x2
-   (*xs
+  (+
+   (*
     (loop for bj across b
        for kj across k
-       for res = (*xs kj bj)
-       then (+x2 res (*xs kj bj))
+       for res = (* kj bj)
+       then (+ res (* kj bj))
        finally (return res))
     h)
    x))
@@ -63,7 +63,7 @@
      for k = (kall fun tm h x s c a) ; k values used in state estimates
      for xl = (xnext x h k bl) ; lower order estimate
      for xh = (xnext x h k bh) ; higher order estimate
-     for err = (norminfx (-x2 xh xl)) ; error estimate
+     for err = (norminfx (- xh xl)) ; error estimate
      for allowed = (* tol (max (norminfx x) 1.0)) ; allowable error
      when (<= err allowed) do ; error acceptable
        (setq tm (+ tm h)) ; update dependant variable
