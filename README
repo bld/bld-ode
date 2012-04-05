@@ -1,11 +1,7 @@
 Ordinary differential equations solvers in Common Lisp
 Currently includes adaptive stepsize Runge-Kutta method.
 Define a function of independant variable & state object as the differential equation to solve.
-State may be any object with state arithmetic methods defined. Number and vector state methods are provided.
-+x2: state addition
--x2: state subtraction
-*xs: state times scalar number
-norminfx: state infinity norm
+State may be any object with generic arithmetic methods for addition, subtraction, and multiplication by a scalar number defined. Number, vector, and hash table state methods are provided. An infinity norm method is also required, which is defined in the generic function NORMINFX.
 
 Usage
 =====
