@@ -23,14 +23,14 @@ X0: state at T0
 Optional key arguments
 ----------------------
 
-:A A matrix (default Dormand-Prince)
-:BL lower order B vector (default Dormand-Prince)
-:BH higher order B vector (default Dormand-Prince)
-:C C vector (default Dormand-Prince)
-:TOL relative tolerance
-:HMAX max stepsize
-:H0 initial stepsize
-:HMIN minimum stepsize
+:A - A matrix (default Dormand-Prince)
+:BL - lower order B vector (default Dormand-Prince)
+:BH - higher order B vector (default Dormand-Prince)
+:C - C vector (default Dormand-Prince)
+:TOL - relative tolerance
+:HMAX - max stepsize
+:H0 - initial stepsize
+:HMIN - minimum stepsize
 
 Examples
 --------
