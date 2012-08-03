@@ -36,3 +36,30 @@ Integrate (cos tn) over range 0 to 2pi:
   (cos tn))
 (rka #'testfun 0d0 (* 2d0 pi) 0d0)
 
+Custom State Classes
+--------------------
+
+Vector and hash tables are provided as state types you can use. If you
+define a custom class as a state, the macro DEFSTATEARITHMETIC can be
+used to define methods on your class for the state arithemetic used in
+BLD-ODE. If your :INITARG entries are different from the slot names,
+you can define them - in the same order as SLOTS - using the keyword
+argument :INITARGS
+
+You can choose which slots of your class to use in the state algebra,
+leaving some out to serve other purposes.
+
+Usage:
+
+(defclass state ()
+   ((x :initarg :x)
+    (dx :initarg :dx)))
+(defstatearithmetic state (x dx))
+
+Optionally specify the INITARG entries:
+
+(defclass state ()
+   ((x :initarg :xarg)
+    (dx :initarg :dxarg)))
+(defstatearithmetic state (x dx) :initargs (:xarg :dxarg))
+
