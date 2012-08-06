@@ -82,11 +82,8 @@ By default, assumes INITARGS of the same name as slots already defined."
   `(progn
      ;; Inifinity norm
      (defmethod norminfx ((x ,class))
-       (make-instance 
-	',class
+       (max
 	,@(loop for slot in slots
-	     for initarg in initargs
-	     collect initarg
 	     collect `(norminfx (slot-value x ',slot)))))
      ;; Addition
      (defmeth2 + ((a ,class) (b ,class))
