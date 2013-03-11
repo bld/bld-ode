@@ -7,15 +7,30 @@ Planned: macro to define methods on custom classes
 
 (in-package :bld-ode)
 
-;; Infinity norm of an ODE state
+;;; Infinity norm of an ODE state
 (defgeneric norminfx (x)
   (:documentation "Infinity norm of a state"))
 
-;; Infinity norm of a number
+;;; Infinity norm of a number
 (defmethod norminfx ((x number))
   (abs x))
 
-;; Vector state arithmetic
+;;; List state arithmetic
+
+(defmeth2 + ((a list) (b list))
+  (mapcar #'+ a b))
+
+(defmeth12 - ((a list) (b list))
+  ((mapcar #'- a))
+  ((mapcar #'- a b)))
+
+(defmeth2 * ((x list) (s number))
+  (mapcar #'(lambda (xi) (* xi s)) x))
+
+(defmethod norminfx ((x list))
+  (reduce #'max (mapcar #'norminfx x)))
+
+;;; Vector state arithmetic
 
 (defmeth2 + ((a vector) (b vector)) 
   (map 'vector #'+ a b))
@@ -33,7 +48,7 @@ Planned: macro to define methods on custom classes
 (defmethod norminfx ((x vector))
   (reduce #'max (map 'vector #'norminfx x)))
 
-;; Hash table state arithmetic
+;;; Hash table state arithmetic
 
 (defmeth2 + ((a hash-table) (b hash-table))
   (let ((result (make-hash-table)))
@@ -66,7 +81,7 @@ Planned: macro to define methods on custom classes
   (loop for v being the hash-values in x
      maximize (norminfx v)))
 
-;; Define PRINT-OBJECT method for hash tables
+;;; Define PRINT-OBJECT method for hash tables
 (defmethod print-object ((h hash-table) stream)
   (format stream "#<HASH-TABLE")
   (maphash #'(lambda (k v) (if (keywordp k) 
@@ -74,7 +89,7 @@ Planned: macro to define methods on custom classes
 			       (format stream " ~a ~a" k v))) h)
   (format stream ">"))
 
-;; Macro to define state arithmethic on a custom class
+;;; Macro to define state arithmethic on a custom class
 (defmacro defstatearithmetic (class slots &key (initargs (mapcar #'make-keyword slots)))
   "Defines state arithmetic for specified class and slots.
 Assumes state arithmetic already defined for slot types, including NORMINFX.
