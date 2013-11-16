@@ -1,7 +1,7 @@
 (in-package :bld-ode)
 
 ;; Stepping functions
-(defun ki (fun tm i h x k c a)
+(defun ki (fun tm i h x k c a param)
   "Calculate intermediate k value"
   (setf (aref k i) (* (aref k 0) (aref a i 0)))
   (loop for j from 1 below i
@@ -9,14 +9,15 @@
   (funcall
    fun
    (+ tm (* h (aref c i)))
-   (+ (* (aref k i) h) x)))
-(defun kall (fun tm h x s c a)
+   (+ (* (aref k i) h) x)
+   param))
+(defun kall (fun tm h x s c a param)
   "Calculate vector of K values"
   (let ((k (make-array 7)))
-    (setf (aref k 0) (funcall fun tm x))
+    (setf (aref k 0) (funcall fun tm x param))
     (loop for i from 1 below s
        do (setf (aref k i)
-		(ki fun tm i h x k c a)))
+		(ki fun tm i h x k c a param)))
     k))
 (defun xnext (x h k b)
   "Calculate next state"
@@ -60,7 +61,7 @@
      with h = h0 ; stepsize
      with x = x0 ; state
      until (or (>= tm tf) (< h hmin)) ; end: final time, h too small
-     for k = (kall fun tm h x s c a) ; k values used in state estimates
+     for k = (kall fun tm h x s c a param) ; k values used in state estimates
      for xl = (xnext x h k bl) ; lower order estimate
      for xh = (xnext x h k bh) ; higher order estimate
      for err = (norminfx (- xh xl)) ; error estimate
