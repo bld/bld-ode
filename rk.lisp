@@ -76,3 +76,36 @@
 	       (setq flag nil) ; flag NIL if TF not reached: h too small
 	       (warn "Stepsize ~a smaller than minimum ~a." h hmin))
        (return (values (cons (list t0 x0) out) flag))))
+
+(defun rka-stop (fun t0 tf x0 &key (a *a-dp*) (bl *bl-dp*) (bh *bh-dp*) (c *c-dp*) (tol 1d-6) (hmax 0.25) (h0 (/ (- tf t0) 200d0)) (hmin (/ (- tf t0) 1d12)) param (stopvalfn #'(lambda (tm x param) tf)) (stopval tf) &aux (s (length bl)))
+  "Runge-Kutta method with adaptive stepsize. States are generic. They may be numbers, arrays, classes, etc., so long as they have state addition and scalar multiplication functions.  Results are collected into a list of independant variables & states. Stopping condition applied."
+  (loop
+     with flag = t ; flag indicating whether integration completed
+     with pow = (/ 1d0 6d0)
+     with tm = t0 ; independant variable (e.g. time)
+     with h = h0 ; stepsize
+     with x = x0 ; state
+     for stopvaltm = (funcall stopvalfn tm x param)
+     until (or (>= stopvaltm stopval)
+	       (< h hmin)) ; end: stop value reached within tolerance, h too small
+     for k = (kall fun tm h x s c a param) ; k values used in state estimates
+     for xl = (xnext x h k bl) ; lower order estimate
+     for xh = (xnext x h k bh) ; higher order estimate
+     for err = (norminfx (- xh xl)) ; error estimate
+     for allowed = (* tol (max (norminfx x) 1.0)) ; allowable error
+     when (<= err allowed) do ; error acceptable
+       (setq tm (+ tm h)) ; update dependant variable
+       (setq x xh) ; update state
+     and collect (list tm x) into out ; collect into return value list
+     do (setq h (min hmax (* 0.8d0 h (expt (/ allowed (max err 1d-16)) pow)))) ; update stepsize
+     do (loop while (> stopvaltm stopval)
+	   do (setq h (/ h 2))
+	     (setq k (kall fun tm h x s c a param))
+	     (setq x (xnext x h k bh))
+	     (setq stopvaltm (funcall stopvalfn tm x param))
+		   
+					; reduce stepsize if stop value exceeded
+     finally (when (< tm tf) ; check if integration finished
+	       (setq flag nil) ; flag NIL if TF not reached: h too small
+	       (warn "Stepsize ~a smaller than minimum ~a." h hmin))
+       (return (values (cons (list t0 x0) out) flag))))
