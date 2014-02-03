@@ -90,10 +90,13 @@ Planned: macro to define methods on custom classes
   (format stream ">"))
 
 ;;; Macro to define state arithmethic on a custom class
-(defmacro defstatearithmetic (class slots &key (initargs (mapcar #'make-keyword slots)))
+(defmacro defstatearithmetic (class slots &key (initargs (mapcar #'make-keyword slots)) oslots (oinitargs (mapcar #'make-keyword oslots)))
   "Defines state arithmetic for specified class and slots.
-Assumes state arithmetic already defined for slot types, including NORMINFX.
-By default, assumes INITARGS of the same name as slots already defined."
+Assumes state arithmetic already defined for slot types, including
+NORMINFX.  By default, assumes INITARGS of the same name as slots
+already defined. Optionally include OSLOTS and OINITARGS for other
+slots that are copied over and not used in the state value arithmetic,
+e.g. parameters that carry over from state to state."
   `(progn
      ;; Inifinity norm
      (defmethod norminfx ((x ,class))
@@ -107,7 +110,11 @@ By default, assumes INITARGS of the same name as slots already defined."
 	,@(loop for slot in slots
 	     for initarg in initargs
 	     collect initarg
-	     collect `(+ (slot-value a ',slot) (slot-value b ',slot)))))
+	     collect `(+ (slot-value a ',slot) (slot-value b ',slot)))
+	,@(loop for oslot in oslots
+	     for oinitarg in oinitargs
+	     collect oinitarg
+	     collect `(slot-value a ',oslot))))
      ;; Negation / Subtraction
      (defmeth12 - ((a ,class) (b ,class))
        ((make-instance
@@ -115,13 +122,21 @@ By default, assumes INITARGS of the same name as slots already defined."
 	 ,@(loop for slot in slots
 	      for initarg in initargs
 	      collect initarg
-	      collect `(- (slot-value a ',slot)))))
+	      collect `(- (slot-value a ',slot)))
+	 ,@(loop for oslot in oslots
+	      for oinitarg in oinitargs
+	      collect oinitarg
+	      collect `(slot-value a ',oslot))))
        ((make-instance
 	 ',class
 	 ,@(loop for slot in slots
 	      for initarg in initargs
 	      collect initarg
-	      collect `(- (slot-value a ',slot) (slot-value b ',slot))))))
+	      collect `(- (slot-value a ',slot) (slot-value b ',slot)))
+	 ,@(loop for oslot in oslots
+	      for oinitarg in oinitargs
+	      collect oinitarg
+	      collect `(slot-value a ',oslot)))))
      ;; Scalar multiplication
      (defmeth2 * ((x ,class) (s number))
        (make-instance 
@@ -129,7 +144,11 @@ By default, assumes INITARGS of the same name as slots already defined."
 	,@(loop for slot in slots
 	     for initarg in initargs
 	     collect initarg
-	     collect `(* (slot-value x ',slot) s))))
+	     collect `(* (slot-value x ',slot) s))
+	,@(loop for oslot in oslots
+	     for oinitarg in oinitargs
+	     collect oinitarg
+	     collect `(slot-value x ',oslot))))
      (defmeth2 * ((s number) (x ,class))
        (* x s))))
 
