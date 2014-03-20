@@ -77,7 +77,7 @@
 	       (warn "Stepsize ~a smaller than minimum ~a." h hmin))
        (return (values (cons (list t0 x0) out) flag))))
 
-(defun rka-stop (fun t0 tf x0 &key (a *a-dp*) (bl *bl-dp*) (bh *bh-dp*) (c *c-dp*) (tol 1d-6) (hmax 0.25) (h0 (/ (- tf t0) 200d0)) (hmin (/ (- tf t0) 1d12)) param (stopvalfn #'(lambda (tm x param) tf)) (stopval tf) &aux (s (length bl)))
+(defun rka-stop (fun t0 tf x0 &key (a *a-dp*) (bl *bl-dp*) (bh *bh-dp*) (c *c-dp*) (tol 1d-6) (hmax (- tf t0)) (h0 (/ (- tf t0) 200d0)) (hmin (/ (- tf t0) 1d12)) param (stopvalfn #'(lambda (tm x param) tf)) (stopval tf) &aux (s (length bl)))
   "Runge-Kutta method with adaptive stepsize. States are generic. They may be numbers, arrays, classes, etc., so long as they have state addition and scalar multiplication functions.  Results are collected into a list of independant variables & states. Stopping condition applied."
   (loop
      with flag = t ; flag indicating whether integration completed
@@ -98,14 +98,7 @@
        (setq x xh) ; update state
      and collect (list tm x) into out ; collect into return value list
      do (setq h (min hmax (* 0.8d0 h (expt (/ allowed (max err 1d-16)) pow)))) ; update stepsize
-     do (loop while (> stopvaltm stopval)
-	   do (setq h (/ h 2))
-	     (setq k (kall fun tm h x s c a param))
-	     (setq x (xnext x h k bh))
-	     (setq stopvaltm (funcall stopvalfn tm x param))
-		   
-					; reduce stepsize if stop value exceeded
-     finally (when (< tm tf) ; check if integration finished
+     finally (when (< stopvaltm stopval) ; check if integration finished
 	       (setq flag nil) ; flag NIL if TF not reached: h too small
 	       (warn "Stepsize ~a smaller than minimum ~a." h hmin))
        (return (values (cons (list t0 x0) out) flag))))
