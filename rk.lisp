@@ -12,7 +12,7 @@
    (+ (* (aref k i) h) x)
    param))
 (defun kall (fun tm h x s c a param)
-  "Calculate vector of K values"
+  "Calculate vector of k values"
   (let ((k (make-array 7)))
     (setf (aref k 0) (funcall fun tm x param))
     (loop for i from 1 below s

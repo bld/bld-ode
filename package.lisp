@@ -10,6 +10,6 @@
     min max signum)
   (:import-from :bld-utils make-keyword maphash2)
   (:import-from :bld-gen defmeth2 defmeth1 defmeth12)
-  (:export :norminfx
-	   :rka
-	   :defstatearithmetic))
+  (:export norminfx
+	   rka
+	   defstatearithmetic))
