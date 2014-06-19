@@ -1,12 +1,15 @@
+bld-ode
+=======
+
 Ordinary differential equations solvers in Common Lisp
 Currently includes adaptive stepsize Runge-Kutta method.
 Define a function of independant variable & state object as the differential equation to solve.
 State may be any object with generic arithmetic methods for addition, subtraction, and multiplication by a scalar number defined. Number, vector, and hash table state methods are provided. An infinity norm method is also required, which is defined in the generic function NORMINFX.
 
 Usage
-=====
+-----
 
-(rka fun t0 tf x0 &key (a *a-dp*) (bl *bl-dp*) (bh *bh-dp*) (c *c-dp*) (tol 1d-6) (hmax 0.25) (h0 (/ (- tf t0) 200d0)) (hmin (/ (- tf t0) 1d12)))
+    (rka fun t0 tf x0 &key (a *a-dp*) (bl *bl-dp*) (bh *bh-dp*) (c *c-dp*) (tol 1d-6) (hmax 0.25) (h0 (/ (- tf t0) 200d0)) (hmin (/ (- tf t0) 1d12)))
 
 Arguments
 ---------
@@ -32,9 +35,10 @@ Examples
 --------
 
 Integrate (cos tn) over range 0 to 2pi:
-(defun testfun (tn x)
-  (cos tn))
-(rka #'testfun 0d0 (* 2d0 pi) 0d0)
+
+    (defun testfun (tn x)
+      (cos tn))
+    (rka #'testfun 0d0 (* 2d0 pi) 0d0)
 
 Custom State Classes
 --------------------
@@ -51,15 +55,23 @@ leaving some out to serve other purposes.
 
 Usage:
 
-(defclass state ()
-   ((x :initarg :x)
-    (dx :initarg :dx)))
-(defstatearithmetic state (x dx))
+    (defclass state ()
+       ((x :initarg :x)
+        (dx :initarg :dx)))
+    (defstatearithmetic state (x dx))
 
 Optionally specify the INITARG entries:
 
-(defclass state ()
-   ((x :initarg :xarg)
-    (dx :initarg :dxarg)))
-(defstatearithmetic state (x dx) :initargs (:xarg :dxarg))
+    (defclass state ()
+       ((x :initarg :xarg)
+        (dx :initarg :dxarg)))
+    (defstatearithmetic state (x dx) :initargs (:xarg :dxarg))
 
+Also, specify data slots that are simply copied and not used in integration:
+
+    (defclass state ()
+       ((x :initarg :x)
+        (dx :initarg :dx)
+	(data1)
+	(data2)))
+    (defstatearithmetic state (x dx) :oslots (data1 data2))
