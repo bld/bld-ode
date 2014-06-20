@@ -9,7 +9,7 @@ State may be any object with generic arithmetic methods for addition, subtractio
 Usage
 -----
 
-    (rka fun t0 tf x0 &key (a *a-dp*) (bl *bl-dp*) (bh *bh-dp*) (c *c-dp*) (tol 1d-6) (hmax 0.25) (h0 (/ (- tf t0) 200d0)) (hmin (/ (- tf t0) 1d12)))
+    (rka fun t0 tf x0 :a *a-dp* :bl *bl-dp* :bh *bh-dp* :c *c-dp* :tol 1d-6 :hmax 0.25 :h0 (/ (- tf t0) 200d0) :hmin (/ (- tf t0) 1d12) :param parameter)
 
 Arguments
 ---------
@@ -19,8 +19,8 @@ T0: starting independant variable
 TF: final independant variable
 X0: state at T0
 
-Optional key arguments
-----------------------
+Optional keyword arguments
+--------------------------
 
 :A - A matrix (default Dormand-Prince)
 :BL - lower order B vector (default Dormand-Prince)
@@ -30,14 +30,15 @@ Optional key arguments
 :HMAX - max stepsize
 :H0 - initial stepsize
 :HMIN - minimum stepsize
+:PARAM - parameter to pass to ODE function
 
 Examples
 --------
 
-Integrate (cos tn) over range 0 to 2pi:
+Integrate (cos (* p tn)) over range 0 to 2pi:
 
-    (defun testfun (tn x)
-      (cos tn))
+    (defun testfun (tn x &optional p)	
+      (cos (* p tn)))
     (rka #'testfun 0d0 (* 2d0 pi) 0d0)
 
 Custom State Classes
@@ -67,7 +68,8 @@ Optionally specify the INITARG entries:
         (dx :initarg :dxarg)))
     (defstatearithmetic state (x dx) :initargs (:xarg :dxarg))
 
-Also, specify data slots that are simply copied and not used in integration:
+Also, you can specify data slots that are simply copied and not used
+in integration:
 
     (defclass state ()
        ((x :initarg :x)
