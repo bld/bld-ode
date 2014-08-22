@@ -12,4 +12,6 @@
   (:import-from :bld-gen defmeth2 defmeth1 defmeth12)
   (:export norminfx
 	   rka
+	   rka-stop
+	   rka-stop-nr
 	   defstatearithmetic))
