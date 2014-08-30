@@ -106,13 +106,12 @@ NMAX: max iterations"
   "Newton Raphson algorithm, where fun(x) is a function that returns
 both the function value and it's derivative"
   (assert (< x-left x-right))
-  (let ((x (/ (- x-left x-right)))
+  (let ((x (/ (+ x-left x-right) 2))
 	delta-x
 	denom-for-acc-test)
-    (dotimes (j max-iter
-	      (if (not (cerror "returns solution so far"
-			       "exceeding max iter"))
-		  (values x max-iter)))
+    (dotimes (j max-iter (if (not (cerror "returns solution so far"
+					  "exceeding max iter"))
+			     (values x max-iter)))
       (multiple-value-bind (f f-prime) (funcall fun x)
 	(setf delta-x (/ f f-prime))
 	(setf denom-for-acc (+ (abs x) (abs (decf x delta-x))))
@@ -126,7 +125,7 @@ both the function value and it's derivative"
 	   (if (< (/ (abs delta-x) denom-for-accuracy-test) accuracy)
 	       (return (values x (1+ j)))))
 	  (t
-	   (error "jumped out of brackets")))))))  
+	   (error "jumped out of brackets")))))))
 
 ;; Runge Kutta w/adaptive stepsize driver function with stopping condition
 (defun rka-stop (fun t0 tfmax x0 &key (a *a-dp*) (bl *bl-dp*) (bh *bh-dp*) (c *c-dp*) (tol 1d-6) (hmax (/ (- tfmax t0) 4)) (h0 (/ (- tfmax t0) 200d0)) (hmin (/ (- tfmax t0) 1d12)) (stopfn #'(lambda (tm x p) tm)) (stopval tfmax) (stoptest #'>=) param &aux (s (length bl)))
@@ -209,7 +208,7 @@ both the function value and it's derivative"
 	 ;; Perform bisection to match stop value in last time interval
 	 (destructuring-bind (tf-1 xf-1) (car (last out 2))
 	   (destructuring-bind (tf+1 xf+1) (car (last out))
-	     ;; Bisection function: take an RK step
+	     ;; NR function: take an RK step
 	     (labels ((rkstep (t0 tm x0)
 			(let* ((h (- tm t0))
 			       (k (kall fun t0 h x0 s c a param)))
