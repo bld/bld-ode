@@ -221,7 +221,7 @@ both the function value and it's derivative"
 			      stopval)
 			   (funcall stopfn tm dx param)))))
 	       ;; Newton Raphson to find TF & XF
-	       (let* ((tf (nr #'nr-fun tf-1 tf+1))
+	       (let* ((tf (nr #'nr-fun tf-1 tf+1 :accuracy tol))
 		      (xf (rkstep tf-1 tf xf-1)))
 		 (values
 		  ;; (t0 x0), accumulated (tm x), and (tf xf) replacing last
