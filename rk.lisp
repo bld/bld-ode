@@ -178,7 +178,7 @@ both the function value and it's derivative"
 		  flag))))))))
 
 ;; Runge Kutta w/adaptive stepsize driver function with Newton-Raphson stopping condition
-(defun rka-stop-nr (fun t0 tfmax x0 &key (a *a-dp*) (bl *bl-dp*) (bh *bh-dp*) (c *c-dp*) (tol 1d-6) (hmax (/ (- tfmax t0) 4)) (h0 (/ (- tfmax t0) 200d0)) (hmin (/ (- tfmax t0) 1d12)) (stopfn #'(lambda (tm x p) tm)) (stopval tfmax) (stoptest #'>=) param &aux (s (length bl)))
+(defun rka-stop-nr (fun t0 tfmax x0 &key (a *a-dp*) (bl *bl-dp*) (bh *bh-dp*) (c *c-dp*) (tol 1d-6) (hmax (/ (- tfmax t0) 4)) (h0 (/ (- tfmax t0) 200d0)) (hmin (/ (- tfmax t0) 1d12)) (stopfn #'(lambda (tm x p) tm)) (stopval tfmax) (stoptest #'>=) (stoptol tol) param &aux (s (length bl)))
   "Runge-Kutta method with adaptive stepsize. States are generic. They may be numbers, arrays, classes, etc., so long as they have state addition and scalar multiplication functions.  Results are collected into a list of independant variables & states."
   (loop
      with flag = t ; flag indicating whether integration completed
@@ -214,14 +214,14 @@ both the function value and it's derivative"
 			       (k (kall fun t0 h x0 s c a param)))
 			  (xnext x0 h k bh)))
 		      (nr-fun (tm)
-			(let ((x (rkstep tf-1 tm xf-1))
-			      (dx (funcall fun tm x param)))
+			(let* ((x (rkstep tf-1 tm xf-1))
+			       (dx (funcall fun tm x param)))
 			  (values
 			   (- (funcall stopfn tm x param)
 			      stopval)
 			   (funcall stopfn tm dx param)))))
 	       ;; Newton Raphson to find TF & XF
-	       (let* ((tf (nr #'nr-fun tf-1 tf+1 :accuracy tol))
+	       (let* ((tf (nr #'nr-fun tf-1 tf+1 :accuracy stoptol))
 		      (xf (rkstep tf-1 tf xf-1)))
 		 (values
 		  ;; (t0 x0), accumulated (tm x), and (tf xf) replacing last
