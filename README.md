@@ -35,11 +35,11 @@ Optional keyword arguments
 Examples
 --------
 
-Integrate (cos (* p tn)) over range 0 to 2pi:
+Integrate (cos (* p tn)) over tn range 0 to 2pi where p = 2:
 
     (defun testfun (tn x &optional p)	
       (cos (* p tn)))
-    (rka #'testfun 0d0 (* 2d0 pi) 0d0)
+    (rka #'testfun 0d0 (* 2d0 pi) 0d0 :param 2)
 
 Custom State Classes
 --------------------
