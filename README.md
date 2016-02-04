@@ -14,23 +14,23 @@ Usage
 Arguments
 ---------
 
-FUN: function of independant variable & state, e.g. (fun tn x)
-T0: starting independant variable
-TF: final independant variable
-X0: state at T0
+- FUN: function of independant variable & state, e.g. (fun tn x)
+- T0: starting independant variable
+- TF: final independant variable
+- X0: state at T0
 
 Optional keyword arguments
 --------------------------
 
-:A - A matrix (default Dormand-Prince)
-:BL - lower order B vector (default Dormand-Prince)
-:BH - higher order B vector (default Dormand-Prince)
-:C - C vector (default Dormand-Prince)
-:TOL - relative tolerance
-:HMAX - max stepsize
-:H0 - initial stepsize
-:HMIN - minimum stepsize
-:PARAM - parameter to pass to ODE function
+- :A - A matrix (default Dormand-Prince)
+- :BL - lower order B vector (default Dormand-Prince)
+- :BH - higher order B vector (default Dormand-Prince)
+- :C - C vector (default Dormand-Prince)
+- :TOL - relative tolerance
+- :HMAX - max stepsize
+- :H0 - initial stepsize
+- :HMIN - minimum stepsize
+- :PARAM - parameter to pass to ODE function
 
 Examples
 --------
