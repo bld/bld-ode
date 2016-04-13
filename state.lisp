@@ -15,21 +15,6 @@ Planned: macro to define methods on custom classes
 (defmethod norminfx ((x number))
   (abs x))
 
-;;; List state arithmetic
-
-(defmeth2 + ((a list) (b list))
-  (mapcar #'+ a b))
-
-(defmeth12 - ((a list) (b list))
-  ((mapcar #'- a))
-  ((mapcar #'- a b)))
-
-(defmeth2 * ((x list) (s number))
-  (mapcar #'(lambda (xi) (* xi s)) x))
-
-(defmethod norminfx ((x list))
-  (reduce #'max (mapcar #'norminfx x)))
-
 ;;; Vector state arithmetic
 
 (defmeth2 + ((a vector) (b vector)) 
