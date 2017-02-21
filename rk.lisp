@@ -11,9 +11,9 @@
    (+ tm (* h (aref c i)))
    (+ (* (aref k i) h) x)
    param))
-(defun kall (fun tm h x s c a param)
+(defun kall (fun tm h x s c a order param)
   "Calculate vector of k values"
-  (let ((k (make-array 7)))
+  (let ((k (make-array order)))
     (setf (aref k 0) (funcall fun tm x param))
     (loop for i from 1 below s
        do (setf (aref k i)
@@ -60,8 +60,9 @@
      with tm = t0 ; independant variable (e.g. time)
      with h = h0 ; stepsize
      with x = x0 ; state
+     with order = (length bh) ; order of RK coefficients
      until (or (>= tm tf) (< h hmin)) ; end: final time, h too small
-     for k = (kall fun tm h x s c a param) ; k values used in state estimates
+     for k = (kall fun tm h x s c a order param) ; k values used in state estimates
      for xl = (xnext x h k bl) ; lower order estimate
      for xh = (xnext x h k bh) ; higher order estimate
      for err = (norminfx (- xh xl)) ; error estimate
@@ -136,10 +137,11 @@ both the function value and it's derivative"
      with tm = t0 ; independant variable (e.g. time)
      with h = h0 ; stepsize
      with x = x0 ; state
+     with order = (length bh) ; order of RK coefficients
      for stopvaltm = (funcall stopfn tm x param)
      ;; end: stop value reached, h too small
      until (or (funcall stoptest stopvaltm stopval) (< h hmin))
-     for k = (kall fun tm h x s c a param) ; k values used in state estimates
+     for k = (kall fun tm h x s c a order param) ; k values used in state estimates
      for xl = (xnext x h k bl) ; lower order estimate
      for xh = (xnext x h k bh) ; higher order estimate
      for err = (norminfx (- xh xl)) ; error estimate
@@ -161,7 +163,7 @@ both the function value and it's derivative"
 	     ;; Bisection function: take an RK step
 	     (labels ((rkstep (t0 tm x0)
 			(let* ((h (- tm t0))
-			       (k (kall fun t0 h x0 s c a param)))
+			       (k (kall fun t0 h x0 s c a order param)))
 			  (xnext x0 h k bh)))
 		      (bisect-fun (tm)
 			(let ((xh (rkstep tf-1 tm xf-1)))
@@ -186,10 +188,11 @@ both the function value and it's derivative"
      with tm = t0 ; independant variable (e.g. time)
      with h = h0 ; stepsize
      with x = x0 ; state
+     with order = (length bh) ; order of RK coefficients
      for stopvaltm = (funcall stopfn tm x param)
      ;; end: stop value reached, h too small
      until (or (funcall stoptest stopvaltm stopval) (< h hmin))
-     for k = (kall fun tm h x s c a param) ; k values used in state estimates
+     for k = (kall fun tm h x s c a order param) ; k values used in state estimates
      for xl = (xnext x h k bl) ; lower order estimate
      for xh = (xnext x h k bh) ; higher order estimate
      for err = (norminfx (- xh xl)) ; error estimate
@@ -211,7 +214,7 @@ both the function value and it's derivative"
 	     ;; NR function: take an RK step
 	     (labels ((rkstep (t0 tm x0)
 			(let* ((h (- tm t0))
-			       (k (kall fun t0 h x0 s c a param)))
+			       (k (kall fun t0 h x0 s c a order param)))
 			  (xnext x0 h k bh)))
 		      (nr-fun (tm)
 			(let* ((x (rkstep tf-1 tm xf-1))
