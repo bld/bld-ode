@@ -4,6 +4,8 @@
 (defpackage :bld-ode-tests
   (:use :cl :bld-ode :fiveam))
 
+(in-package :bld-ode-tests)
+
 (def-suite :bld-ode)
 
 (in-suite :bld-ode)

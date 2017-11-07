@@ -8,4 +8,5 @@
   ((:file "package")
    (:file "state" :depends-on ("package"))
    (:file "rk" :depends-on ("package" "state"))
-   (:file "rk23" :depends-on ("rk"))))
+   (:file "rk23" :depends-on ("rk"))
+   (:file "dp" :depends-on ("rk"))))
